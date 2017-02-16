@@ -3,14 +3,18 @@ import random
 from time import sleep
 
 class Cell:
+	x = None
+	y = None
+	label = None
+	
 	def __init__(self, x, y):
-		self.xpos = x
-		self.ypos = y
-		self.label = ""
+		self.x = x
+		self.y = y
 
 class Game:
 	def __init__(self):
 		self.life = 100
+		self.score = 0
 		self.height = 8
 		self.width = 8
 		self.apple = []
@@ -30,6 +34,20 @@ class Game:
 					
 				row.append(c)
 			self.grid.append(row)
+			
+	def initGame(self):
+		ax = random.randint(0,self.height - 1)
+		ay = random.randint(0,self.width - 1)
+		self.apple = [ax, ay]
+		sx = random.randint(0,self.height - 1)
+		sy = random.randint(0,self.width - 1)
+		self.snake.append([sx,sy])
+		
+	def resetGame(self):
+		self.life = 100
+		self.score = 0
+		self.apple = []
+		self.snake = []
 			
 	def printFrame(self):
 		top = "+"
@@ -53,7 +71,7 @@ class Game:
 			row += "|"
 			print row
 			
-		print top
+		print top			
 
 class Sneku:
 	
@@ -63,7 +81,7 @@ class Sneku:
 		self.state = 0
 		self.game = Game()
 		self.tile_plain = tk.PhotoImage(file = "images/plain.gif")
-		self.tile_head = tk.PhotoImage(file = "images/snekuBody.gif")
+		self.tile_body = tk.PhotoImage(file = "images/snekuBody.gif")
 		self.tile_apple = tk.PhotoImage(file = "images/apple.gif")
 		self.snekuSelfie = tk.PhotoImage(file="images/snek.gif")
 
@@ -87,13 +105,15 @@ class Sneku:
 
 		self.snekuFrame = tk.Frame(master).grid(row=2)
 		
-		for i in range(3, 3 + self.game.height):
-			for j in range(1, 1 + self.game.width):
-				print i,j
+		rowOffset = 3
+		columnOffset = 1
+		
+		for i in range(self.game.height):
+			for j in range(self.game.width):
 				tile = tk.Label(self.snekuFrame, image=self.tile_plain, borderwidth=0)
 				tile.photo = self.tile_plain
-				tile.grid(row=i, column=j)
-				self.game.grid[i-3][j-1].label = tile
+				tile.grid(row=rowOffset+i, column=columnOffset+j)
+				self.game.grid[i][j].label = tile
 				
 		self.snekuRights = tk.Label(text="Copyright 2017 Baenet Industries").grid(row=3+self.game.height, column=0, columnspan=2+self.game.width)
 		
@@ -104,15 +124,34 @@ class Sneku:
 			
 		print "Starting game..."
 		self.state = 1
-		counter = 0
+		self.game.resetGame()
+		self.game.initGame()
 		self.updateCells()
+		
 		print "Game over!"
+		self.state = 0
+		
+	def endGame(self):
 		self.state = 0
 
 	def updateCells(self):
+		print "Snake pos: %s" % self.game.snake
+		print "Apple pos: %s" % self.game.apple
 		for row in self.game.grid:
 			for cell in row:
-				print cell.label.photo
+				pos = [cell.x, cell.y]
+				print pos
+				
+				if pos == self.game.apple:
+					cell.label.configure(image=self.tile_apple)
+					cell.label.photo = self.tile_apple
+					
+				elif pos in self.game.snake:
+					cell.label.configure(image=self.tile_body)
+					cell.label.photo = self.tile_body
+				else:
+					cell.label.configure(image=self.tile_plain)
+					cell.label.photo = self.tile_plain
 		
 	def increaseScore(self):
 		self.score += 1
