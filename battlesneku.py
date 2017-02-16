@@ -67,21 +67,21 @@ class Sneku:
 		self.tile_apple = tk.PhotoImage(file = "images/apple.gif")
 		self.snekuSelfie = tk.PhotoImage(file="images/snek.gif")
 
-		snekuStatusBar = tk.Frame(master).grid(row=0, sticky=tk.W+tk.E+tk.N)
+		snekuStatusBar = tk.Frame(master).grid(row=0)
 		master.grid_columnconfigure(0, weight=1)
-		master.grid_columnconfigure(self.game.width-1, weight=1)
+		master.grid_columnconfigure(self.game.width+1, weight=1)
 
-		tk.Label(snekuStatusBar, text="Life").grid(row=0, column=0, columnspan=1, sticky=tk.W+tk.E)
+		tk.Label(snekuStatusBar, text="Life").grid(row=0, column=0, columnspan=1)
 		self.lifeLabel = tk.Label(snekuStatusBar, text="100")
-		self.lifeLabel.grid(row=1, column=0, columnspan=1, sticky=tk.W+tk.E)
+		self.lifeLabel.grid(row=1, column=0, columnspan=1)
 
 		distinguishedSneku = tk.Button(snekuStatusBar, image=self.snekuSelfie, command=self.startGame)
 		distinguishedSneku.photo = self.snekuSelfie
 		distinguishedSneku.grid(row=0, column=1, columnspan=self.game.width, rowspan=2)
 		
-		tk.Label(snekuStatusBar, text="Score").grid(row=0, column=1+self.game.width, columnspan=1, sticky=tk.W+tk.E)
+		tk.Label(snekuStatusBar, text="Score").grid(row=0, column=1+self.game.width, columnspan=1)
 		self.scoreLabel = tk.Label(snekuStatusBar, text="0")
-		self.scoreLabel.grid(row=1, column=1+self.game.width, columnspan=1, sticky=tk.W+tk.E)
+		self.scoreLabel.grid(row=1, column=1+self.game.width, columnspan=1)
 		
 		tk.Label(text="").grid(row=2, column=0, columnspan=2+self.game.width)
 
@@ -89,6 +89,7 @@ class Sneku:
 		
 		for i in range(3, 3 + self.game.height):
 			for j in range(1, 1 + self.game.width):
+				print i,j
 				tile = tk.Label(self.snekuFrame, image=self.tile_plain, borderwidth=0)
 				tile.photo = self.tile_plain
 				tile.grid(row=i, column=j)
