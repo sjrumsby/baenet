@@ -87,14 +87,14 @@ class Battlesneku:
 			return
 		
 		for s in self.game.snekus:
-			move = s.makeMove()
+			move = s.makeMove(self.game.getBoard())
 		
 		self.game.updateBoard()
 		self.updateCells()
 		
 def Refresher(snekGame):
     snekGame.hssst()
-    root.after(1000, Refresher, snekGame)
+    root.after(50, Refresher, snekGame)
 
 root = tk.Tk()
 root.title("Sneku Feeding!")

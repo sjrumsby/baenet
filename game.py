@@ -26,14 +26,15 @@ class Game:
             self.grid.append(row)
             
     def initGame(self):
-        self.apple = self.getRandomCoords()
+        tastyTuna = self.getRandomCoords()
         
         snakeHouse = self.getRandomCoords()
-        while snakeHouse == self.apple:
+        while snakeHouse == tastyTuna:
             snakeHouse = self.getRandomCoords()
             
-        sneku = Sneku(snakeHouse[0], snakeHouse[1], (self.height, self.width), self.apple)
+        sneku = Sneku(snakeHouse[0], snakeHouse[1], (self.height, self.width), tastyTuna)
         self.snekus.append(sneku)
+        self.apple = tastyTuna
         
         print "Start game... apple: %s. snake: %s" % (self.apple, snakeHouse)
         
@@ -69,6 +70,17 @@ class Game:
                 s.eatApple(self.apple)
 
                 
-                
+    def getBoard(self):
+        board = {
+            "height": self.height,
+            "width": self.width,
+            "apple": self.apple,
+            "snekus": []
+        }
+        
+        for sneku in self.snekus:
+            board['snekus'].append(sneku.body)
+            
+        return board
                 
                 
