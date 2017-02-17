@@ -11,4 +11,3 @@ class Cell:
     def updateCell(self, image):
         self.label.configure(image=image)
         self.label.photo = image
-        print "Updated cell!"

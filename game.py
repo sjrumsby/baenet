@@ -4,10 +4,8 @@ import random
 
 class Game:
     def __init__(self):
-        self.life = 100
-        self.score = 0
-        self.height = 5
-        self.width = 5
+        self.height = 17
+        self.width = 17
         self.apple = []
         self.snekus = []
         self.grid = []
@@ -28,16 +26,49 @@ class Game:
             self.grid.append(row)
             
     def initGame(self):
-        ax = random.randint(0,self.height - 1)
-        ay = random.randint(0,self.width - 1)
-        self.apple = [ax, ay]
-        sx = random.randint(0,self.height - 1)
-        sy = random.randint(0,self.width - 1)
-        sneku = Sneku(sx, sy, (self.height, self.width), self.apple)
+        self.apple = self.getRandomCoords()
+        
+        snakeHouse = self.getRandomCoords()
+        while snakeHouse == self.apple:
+            snakeHouse = self.getRandomCoords()
+            
+        sneku = Sneku(snakeHouse[0], snakeHouse[1], (self.height, self.width), self.apple)
         self.snekus.append(sneku)
+        
+        print "Start game... apple: %s. snake: %s" % (self.apple, snakeHouse)
         
     def resetGame(self):
         self.life = 100
         self.score = 0
         self.apple = []
         self.snake = []
+        
+    def getRandomCoords(self):
+        x = random.randint(0,self.height - 1)
+        y = random.randint(0,self.width - 1)
+        return [x,y]
+        
+    def spawnNewApple(self):
+        tastyTuna = self.getRandomCoords()
+        
+        while tastyTuna == self.apple or tastyTuna in self.snekus[0].body:
+            tastyTuna = self.getRandomCoords()
+
+        self.apple = tastyTuna
+        print "New apple spawned at: %s" % tastyTuna
+        
+    def updateBoard(self):
+        for s in self.snekus:
+            if s.head[0] < 0 or s.head[0] >= self.height:
+                s.killSnake()
+            if s.head[1] < 0 or s.head[1] >= self.width:
+                s.killSnake()
+        
+            if s.head == self.apple:
+                self.spawnNewApple()
+                s.eatApple(self.apple)
+
+                
+                
+                
+                
