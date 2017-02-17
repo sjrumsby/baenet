@@ -1,79 +1,8 @@
 import Tkinter as tk
-import random
+from game import *
 from time import sleep
 
-class Cell:
-	x = None
-	y = None
-	label = None
-	
-	def __init__(self, x, y):
-		self.x = x
-		self.y = y
-
-class Game:
-	def __init__(self):
-		self.life = 100
-		self.score = 0
-		self.height = 8
-		self.width = 8
-		self.apple = []
-		self.snake = []
-		self.grid = []
-		
-		for i in range(self.height):
-			row = []
-			for j in range(self.width):
-				c = Cell(i,j)
-				
-				if [i,j] in self.snake:
-					c.content = 1
-					
-				if [i,j] == self.apple:
-					c.content = -1
-					
-				row.append(c)
-			self.grid.append(row)
-			
-	def initGame(self):
-		ax = random.randint(0,self.height - 1)
-		ay = random.randint(0,self.width - 1)
-		self.apple = [ax, ay]
-		sx = random.randint(0,self.height - 1)
-		sy = random.randint(0,self.width - 1)
-		self.snake.append([sx,sy])
-		
-	def resetGame(self):
-		self.life = 100
-		self.score = 0
-		self.apple = []
-		self.snake = []
-			
-	def printFrame(self):
-		top = "+"
-		for i in range(self.width):
-			top += "-"
-		top += "+"
-		
-		print top
-		for i in range(self.height):
-			row = "|"
-			
-			for j in range(self.width):
-				if self.grid[i][j].content == -1:
-					row += "a"
-				elif self.grid[i][j].content == 0:
-					row += " "
-				elif self.grid[i][j].content == 1:
-					row += "s"
-				else:
-					raise ValueError("Invalid cell content value: %s" % self.grid[i][j].content)
-			row += "|"
-			print row
-			
-		print top			
-
-class Sneku:
+class Battlesneku:
 	
 	def __init__(self, master):
 		self.score = 0
@@ -128,30 +57,37 @@ class Sneku:
 		self.game.initGame()
 		self.updateCells()
 		
-		print "Game over!"
-		self.state = 0
-		
 	def endGame(self):
 		self.state = 0
 
 	def updateCells(self):
-		print "Snake pos: %s" % self.game.snake
+		print "Snake pos: %s" % self.game.snekus[0].body
 		print "Apple pos: %s" % self.game.apple
 		for row in self.game.grid:
 			for cell in row:
 				pos = [cell.x, cell.y]
-				print pos
 				
 				if pos == self.game.apple:
-					cell.label.configure(image=self.tile_apple)
-					cell.label.photo = self.tile_apple
-					
-				elif pos in self.game.snake:
-					cell.label.configure(image=self.tile_body)
-					cell.label.photo = self.tile_body
+					print "Found an apple"
+					cell.updateCell(self.tile_apple)
+				elif pos in self.game.snekus[0].body:
+					print "Found a snake"
+					cell.updateCell(self.tile_body)
 				else:
-					cell.label.configure(image=self.tile_plain)
-					cell.label.photo = self.tile_plain
+					cell.updateCell(self.tile_plain)
+					
+		print "Updated cells"
+		
+	def hssst(self):
+		if self.state != 1:
+			return
+		
+		for s in self.game.snekus:
+			print "Make a move!"
+			move = s.makeMove()
+			print move
+			
+		self.updateCells()
 		
 	def increaseScore(self):
 		self.score += 1
@@ -161,10 +97,14 @@ class Sneku:
 	
 	def setMaxLife(self):
 		self.life = 100
+		
+def Refresher(snekGame):
+    snekGame.hssst()
+    root.after(1000, Refresher, snekGame)
 
 root = tk.Tk()
 root.title("Sneku Feeding!")
 
-snek = Sneku(root)
-
+snek = Battlesneku(root)
+Refresher(snek)
 root.mainloop()
