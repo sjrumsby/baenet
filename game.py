@@ -36,13 +36,20 @@ class Game:
         self.snekus.append(sneku)
         self.apple = tastyTuna
         
+        #snakeHouse = [0,13]
+        #tastyTuna = [15,16]
+        #sneku = Sneku(snakeHouse[0], snakeHouse[1], (self.height, self.width), tastyTuna)
+        #self.snekus = []
+        #self.snekus.append(sneku)
+        #self.apple = tastyTuna
+        
         print "Start game... apple: %s. snake: %s" % (self.apple, snakeHouse)
         
     def resetGame(self):
         self.life = 100
         self.score = 0
         self.apple = []
-        self.snake = []
+        self.snekus = []
         
     def getRandomCoords(self):
         x = random.randint(0,self.height - 1)
@@ -59,15 +66,18 @@ class Game:
         print "New apple spawned at: %s" % tastyTuna
         
     def updateBoard(self):
-        for s in self.snekus:
-            if s.head[0] < 0 or s.head[0] >= self.height:
-                s.killSnake()
-            if s.head[1] < 0 or s.head[1] >= self.width:
-                s.killSnake()
+        for sneku in self.snekus:
+            if sneku.head[0] < 0 or sneku.head[0] >= self.height:
+                sneku.killSnake()
+            if sneku.head[1] < 0 or sneku.head[1] >= self.width:
+                sneku.killSnake()
+            
+            if sneku.life <= 0:
+                sneku.killSnake()
         
-            if s.head == self.apple:
+            if sneku.head == self.apple:
                 self.spawnNewApple()
-                s.eatApple(self.apple)
+                sneku.eatApple(self.apple)
 
                 
     def getBoard(self):

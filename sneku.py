@@ -20,7 +20,10 @@ class Sneku:
         self.dead = 0
         self.lastMove = []
         
-        return farthestPoint
+        
+        #self.body = [[12, 6], [12, 5], [12, 4], [12, 3], [12, 2], [12, 1], [12, 0], [13, 0], [13, 1], [13, 2], [13, 3], [13, 4], [13, 5], [13, 6], [14, 6], [14, 7], [14, 8], [14, 9], [14, 10], [14, 11], [14, 12], [14, 13], [13, 13], [12, 13], [11, 13], [10, 13], [9, 13], [8, 13], [7, 13], [7, 14], [8, 14], [9, 14], [10, 14], [11, 14], [12, 14], [13, 14], [13, 15], [14, 15], [14, 16], [13, 16], [12, 16], [11, 16], [10, 16], [9, 16], [8, 16], [7, 16], [6, 16], [6, 15], [6, 14], [6, 13], [6, 12], [6, 11], [6, 10], [6, 9], [6, 8], [7, 8], [8, 8], [9, 8], [10, 8], [11, 8], [12, 8], [13, 8], [13, 7]]
+        #self.length = len(self.body)
+        
     
     def playWithFood(self):
         #TODO: Figure out how to move around if we fucked up
@@ -28,13 +31,14 @@ class Sneku:
         return False
     
     def makeMove(self, board):
+        print "====="
         def heuristic(a, b):
             return (b[0] - a[0]) ** 2 + (b[1] - a[1]) ** 2
     
         def astar(array, start, goal):
             print "Finding move from %s to %s" % (start, goal)
     
-            neighbors = [(0,1),(0,-1),(1,0),(-1,0)]
+            neighbors = [(0,1),(1,0),(0,-1),(-1,0)]
     
             close_set = set()
             came_from = {}
@@ -93,25 +97,65 @@ class Sneku:
                             
                 gridRow.append(g)
             grid.append(gridRow)
-            
-        nmap = numpy.array(grid)
-        nextMove = astar(nmap, tuple(self.head), tuple(self.apple))
         
-        if not nextMove:
-            #If no path to apple exists, try to move around and hopefully one opens up
-            nextMove = self.playWithFood()
-            
-            if not nextMove:
-                nextMove = self.lastMove
+        tuna = tuple(self.apple)
+        head = tuple(self.head)
+        tail = tuple(self.body[0])
+        
+        tunaGrid = list(grid)
+        tunaGrid[tail[0]][tail[1]] = 0
+        
+        nmap = numpy.array(grid)
+        tunaMap = numpy.array(tunaGrid)
+        
+        headToTuna = astar(nmap, head, tuna)
+        headToTail = astar(tunaMap, head, tail)
+        tunaToTail = astar(tunaMap, tuna, tail)
+        
+        print "Snake: %s" % self.body
+        print "Head: %s. Tail: %s. Apple: %s" % (self.head, self.body[0], self.apple)
+        print "Head to Tuna: %s" % headToTuna
+        print "Head to Tail: %s" % headToTail
+        print "Tuna to Tail: %s" % tunaToTail
+        
+        if tunaToTail:
+            if headToTuna:
+                print "Moving to tuna"
+                nextMove = headToTuna[-1]
             else:
-                nextMove = nextMove[-1]
+                if headToTail:
+                    print "Actually... nope. Moving to tail"
+                    nextMove = headToTail[-1]
+                else:
+                    nextMove = [self.head[0] + self.lastMove[0], self.head[1] + self.lastMove[1]]
         else:
-            nextMove = nextMove[-1]
+            if headToTuna and len(headToTuna) == 1:
+                print "Moving to food"
+                nextMove = headToTuna[-1]
+            else:
+                print "Moving to tail"
+                if headToTail:
+                    nextMove = headToTail[-1]
+                else:
+                    if headToTuna:
+                        nextMove = headToTuna[-1]
+                    else:
+                        nextMove = [self.head[0] + self.lastMove[0], self.head[1] + self.lastMove[1]]
             
+        print nextMove
         move = [0,0]
         move[0] = nextMove[0] - self.head[0]
         move[1] = nextMove[1] - self.head[1]
         print "Next move: %s" % move
+        
+        if not self.sanityCheckMove(move):
+            print "Sanity check failed. Find a new move"
+            
+            for m in [[0,1],[0,-1],[1,0],[-1,0]]:
+                if self.sanityCheckMove(m):
+                    move = m
+                    print "Founda new move. Let's move %s instead" % move
+                    break
         
         self.head[0] += move[0]
         self.head[1] += move[1]
@@ -124,6 +168,22 @@ class Sneku:
         self.lastMove = move
         return move
         
+    def sanityCheckMove(self, move):
+        nextPos = [self.head[0] + move[0], self.head[1] + move[1]]
+        
+        if nextPos[0] < 0 or nextPos[0] > self.dimensions[0]:
+            print "Dont do that! You'll hit a wall!"
+            return False
+        if nextPos[1] < 0 or nextPos[1] > self.dimensions[1]:
+            print "Dont do that! You'll hit a wall!"
+            return False
+        if nextPos in self.body:
+            print "Don't do that, you'll hit yourself!"
+            return False
+            
+        return True
+        
+    
     def eatApple(self, apple):
         print apple
         self.length += 2
