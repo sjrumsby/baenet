@@ -74,6 +74,9 @@ class Game:
             
             if sneku.life <= 0:
                 sneku.killSnake()
+            
+            if len([x for x in sneku.body if sneku.body.count(x) > 1]):
+                sneku.killSnake()
         
             if sneku.head == self.apple:
                 self.spawnNewApple()

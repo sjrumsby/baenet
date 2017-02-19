@@ -1,7 +1,7 @@
 import Tkinter as tk
 import tkMessageBox
 from game import *
-from time import sleep
+from time import sleep, time
 
 class Battlesneku:
 	
@@ -73,6 +73,10 @@ class Battlesneku:
 
     def updateCells(self):
         print "Updating cells"
+        
+        if not self.state:
+            return
+            
         #Build the grid so we know which cells have been drawn
         grid = []
         for i in range(self.game.height):
@@ -112,41 +116,21 @@ class Battlesneku:
                 else:
                     print "This shouldn't be possible..."
                     self.endGame()
+                    
                 grid[sneku.body[0][0]][sneku.body[0][1]] = 1
                 grid[sneku.body[1][0]][sneku.body[1][1]] = 1
             else:
-                if sneku.lastTail:
-                    initDirection = [sneku.body[1][0] - sneku.body[0][0], sneku.body[1][1] - sneku.body[0][1]]
-                    lastDirection = [sneku.body[0][0] - sneku.lastTail[0], sneku.body[0][1] - sneku.lastTail[1]]
-                    moves = [lastDirection, initDirection]
-                    
-                    if moves == [[1,0],[1,0]] or moves == [[-1,0],[-1,0]]:
-                        self.game.grid[sneku.body[0][0]][sneku.body[0][1]].updateCell(self.tile_body_white_up)
-                        
-                    elif moves == [[0,1],[0,1]] or moves == [[0,-1],[0,-1]]:
-                        self.game.grid[sneku.body[0][0]][sneku.body[0][1]].updateCell(self.tile_body_white_across)
-                        
-                    elif moves == [[-1,0],[0,-1]] or moves == [[0,1],[1,0]]:
-                        self.game.grid[sneku.body[0][0]][sneku.body[0][1]].updateCell(self.tile_body_white_leftDown)
-                        
-                    elif moves == [[-1,0],[0,1]] or moves == [[0,-1],[1,0]]:
-                        self.game.grid[sneku.body[0][0]][sneku.body[0][1]].updateCell(self.tile_body_white_rightDown)
-                        
-                    elif moves == [[0,1],[-1,0]] or moves == [[1,0],[0,-1]]:
-                        self.game.grid[sneku.body[0][0]][sneku.body[0][1]].updateCell(self.tile_body_white_leftUp)
-                        
-                    elif moves == [[0,-1],[-1,0]] or moves == [[1,0],[0,1]]:
-                        self.game.grid[sneku.body[0][0]][sneku.body[0][1]].updateCell(self.tile_body_white_rightUp)
-                else:
-                    initDirection = [sneku.body[1][0] - sneku.body[0][0], sneku.body[1][1] - sneku.body[0][1]]
-                    if initDirection == [-1,0] or initDirection == [1,0]:
-                        self.game.grid[sneku.body[0][0]][sneku.body[0][1]].updateCell(self.tile_body_white_up)
-                    else:
-                        self.game.grid[sneku.body[0][0]][sneku.body[0][1]].updateCell(self.tile_body_white_across)
-                    
-                grid[sneku.body[0][0]][sneku.body[0][1]] = 1
+                initDirection = [sneku.body[0][0] - sneku.body[1][0], sneku.body[0][1] - sneku.body[1][1]]
+                if initDirection == [-1,0]:
+                    self.game.grid[sneku.body[0][0]][sneku.body[0][1]].updateCell(self.tile_head_white_up)
+                elif initDirection == [1,0]:
+                    self.game.grid[sneku.body[0][0]][sneku.body[0][1]].updateCell(self.tile_head_white_down)
+                elif initDirection == [0,-1]:
+                    self.game.grid[sneku.body[0][0]][sneku.body[0][1]].updateCell(self.tile_head_white_left)
+                elif initDirection == [0,1]:
+                    self.game.grid[sneku.body[0][0]][sneku.body[0][1]].updateCell(self.tile_head_white_right)
                 
-                print "Set tail. Direction: %s" % initDirection
+                grid[sneku.body[0][0]][sneku.body[0][1]] = 1
                     
                 for s in range(1, len(sneku.body) - 1):
                     moves = [[sneku.body[s][0] - sneku.body[s-1][0], sneku.body[s][1] - sneku.body[s-1][1]],[sneku.body[s+1][0] - sneku.body[s][0], sneku.body[s+1][1] - sneku.body[s][1]]]
@@ -184,7 +168,6 @@ class Battlesneku:
                 elif headDirection == [0,1]:
                     self.game.grid[sneku.body[-1][0]][sneku.body[-1][1]].updateCell(self.tile_head_white_right)
                     
-                print "Set head. direction: %s" % headDirection
                 grid[sneku.body[-1][0]][sneku.body[-1][1]] = 1
                         
         #Set evertyhing else to black
@@ -201,23 +184,38 @@ class Battlesneku:
 			if sneku.dead == 0:
 				stillHungry = 1
          
-		if not stillHungry:
-			self.endGame()
-			tkMessageBox.showwarning("Game over", "Sneku dedded")
+        if not stillHungry:
+            if self.state == 1:
+                tkMessageBox.showwarning("Game over", "Sneku dedded")
+            self.state = 0
 
     def hssst(self):
         if self.state != 1:
             return
         
         for s in self.game.snekus:
+            move_st = time()
             move = s.makeMove(self.game.getBoard())
+            move_et = time()
         
+        board_st = time()
         self.game.updateBoard()
+        board_et = time()
+        
+        cells_st = time()
         self.updateCells()
+        cells_et = time()
+        
+        moves_time = move_et - move_st
+        board_time = board_et - board_st
+        cells_time = cells_et - cells_st
+        total_time = moves_time + board_time + cells_time
+        
+        #print "Total: %s. Move: %s. Board %s. Cells: %s" % (total_time, moves_time, board_time, cells_time)
 		
 def Refresher(snekGame):
     snekGame.hssst()
-    root.after(500, Refresher, snekGame)
+    root.after(50, Refresher, snekGame)
 
 root = tk.Tk()
 root.title("Sneku Feeding!")
