@@ -68,33 +68,48 @@ class Game:
         print "New apple spawned at: %s" % tastyTuna
         
     def updateBoard(self):
-        for sneku in self.snekus:
-            otherSnekus = [s for s in self.snekus if s != sneku and s.dead == False]
+        sneksToKill = []
+        aliveSnekus =  [s for s in self.snekus if s.dead == False]
+        
+        for sneku in aliveSnekus:
+            otherSnekus = [s for s in aliveSnekus if s != sneku and s.dead == False]
             
             #If we stepped outside the board
             if sneku.head[0] < 0 or sneku.head[0] >= self.height:
-                sneku.killSnake()
+                print "(%s) SNEK DOWN... Stepped outside the board" % sneku.colour
+                sneksToKill.append(sneku)
             if sneku.head[1] < 0 or sneku.head[1] >= self.width:
-                sneku.killSnake()
+                print "(%s) SNEK DOWN... Stepped outside the board" % sneku.colour
+                sneksToKill.append(sneku)
             
             #If our life reaches zero
             if sneku.life <= 0:
-                sneku.killSnake()
+                print "(%s) SNEK DOWN... Died of hunger" % sneku.colour
+                sneksToKill.append(sneku)
             
             #If we stepped on ourself
             if len([x for x in sneku.body if sneku.body.count(x) > 1]):
-                sneku.killSnake()
+                print "(%s) SNEK DOWN... Ran into itself" % sneku.colour
+                sneksToKill.append(sneku)
         
             #If we stepped onto someone else
             for o in otherSnekus:
                 if sneku.head in o.body:
-                    sneku.killSnake()
+                    if sneku.head == o.head:
+                        if len(sneku.body) < len(o.body):
+                            print "(%s) SNEK DOWN... Ran into the head of other sneku (%s) and is smaller" % (sneku.colour, o.colour)
+                            sneksToKill.append(sneku)
+                    else:
+                        print "(%s) SNEK DOWN... Ran into the body of other sneku (%s)" % (sneku.colour, o.colour)
+                        sneksToKill.append(sneku)
             
             if sneku.head == self.apple:
                 self.spawnNewApple()
                 sneku.eatApple(self.apple)
-
-                
+       
+        for soonToBeDeadSneku in sneksToKill:
+            soonToBeDeadSneku.killSneku()
+            
     def getBoard(self):
         board = {
             "height": self.height,

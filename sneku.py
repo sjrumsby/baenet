@@ -14,24 +14,14 @@ class Sneku:
         self.dead = False
         self.lastMove = []
         self.lastTail = []
-        
-        #self.body = [[12, 6], [12, 5], [12, 4], [12, 3], [12, 2], [12, 1], [12, 0], [13, 0], [13, 1], [13, 2], [13, 3], [13, 4], [13, 5], [13, 6], [14, 6], [14, 7], [14, 8], [14, 9], [14, 10], [14, 11], [14, 12], [14, 13], [13, 13], [12, 13], [11, 13], [10, 13], [9, 13], [8, 13], [7, 13], [7, 14], [8, 14], [9, 14], [10, 14], [11, 14], [12, 14], [13, 14], [13, 15], [14, 15], [14, 16], [13, 16], [12, 16], [11, 16], [10, 16], [9, 16], [8, 16], [7, 16], [6, 16], [6, 15], [6, 14], [6, 13], [6, 12], [6, 11], [6, 10], [6, 9], [6, 8], [7, 8], [8, 8], [9, 8], [10, 8], [11, 8], [12, 8], [13, 8], [13, 7]]
-        #self.length = len(self.body)
-    
-    def playWithFood(self):
-        #TODO: Figure out how to move around if we fucked up
-        #Return false for now to keep moving in whatever direction we went last time
-        return False
     
     def makeMove(self, board):
-        print "====="
         self.apple = board["apple"]
+        
         def heuristic(a, b):
             return (b[0] - a[0]) ** 2 + (b[1] - a[1]) ** 2
     
         def astar(array, start, goal):
-            #print "Finding move from %s to %s" % (start, goal)
-    
             neighbors = [(0,1),(1,0),(0,-1),(-1,0)]
     
             close_set = set()
@@ -61,10 +51,8 @@ class Sneku:
                             if array[neighbor[0]][neighbor[1]] == 1:
                                 continue
                         else:
-                            # array bound y walls
                             continue
                     else:
-                        # array bound x walls
                         continue
                     
                     if neighbor in close_set and tentative_g_score >= gscore.get(neighbor, 0):
@@ -106,12 +94,6 @@ class Sneku:
         headToTail = astar(tunaMap, head, tail)
         tunaToTail = astar(tunaMap, tuna, tail)
         
-        #print "Snake: %s" % self.body
-        #print "Head: %s. Tail: %s. Apple: %s" % (self.head, self.body[0], self.apple)
-        #print "Head to Tuna: %s" % headToTuna
-        #print "Head to Tail: %s" % headToTail
-        #print "Tuna to Tail: %s" % tunaToTail
-        
         if tunaToTail:
             if headToTuna:
                 nextMove = headToTuna[-1]
@@ -132,7 +114,6 @@ class Sneku:
                     else:
                         nextMove = [self.head[0] + self.lastMove[0], self.head[1] + self.lastMove[1]]
             
-        print nextMove
         move = [0,0]
         move[0] = nextMove[0] - self.head[0]
         move[1] = nextMove[1] - self.head[1]
@@ -151,7 +132,6 @@ class Sneku:
             self.lastTail = self.body[0]
             self.body = self.body[1:]
         
-        print "Moving: %s. Length: %s. Life: %s. Status : %s" % (move, self.length, self.life, self.dead)
         self.lastMove = move
         return move
         
@@ -159,24 +139,23 @@ class Sneku:
         nextPos = [self.head[0] + move[0], self.head[1] + move[1]]
         
         if nextPos[0] < 0 or nextPos[0] >= self.dimensions[0]:
-            print "Dont do that! You'll hit a wall!"
+            print "(%s) Dont do that! You'll hit a wall!" % (self.colour)
             return False
         if nextPos[1] < 0 or nextPos[1] >= self.dimensions[1]:
-            print "Dont do that! You'll hit a wall!"
+            print "(%s) Dont do that! You'll hit a wall!" % (self.colour)
             return False
         if nextPos in self.body:
-            print "Don't do that, you'll hit yourself!"
+            print "(%s) Don't do that, you'll hit yourself!" % (self.colour)
             return False
             
         return True
         
     
     def eatApple(self, apple):
-        print apple
         self.length += 2
         self.life = 100
         self.score += 1
         self.apple = apple
         
-    def killSnake(self):
+    def killSneku(self):
         self.dead = True

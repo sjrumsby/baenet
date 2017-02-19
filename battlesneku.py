@@ -7,14 +7,14 @@ class Battlesneku:
 	
     def __init__(self, master):
         self.state = 0
-        self.numSnakes = 2
+        self.numSnakes = 6
         self.game = Game(17,17)
         self.tile_plain = tk.PhotoImage(file = "images/plain.gif")
         self.tile_apple = tk.PhotoImage(file = "images/apple.gif")
         self.snekuSelfie = tk.PhotoImage(file="images/snek.gif")
         
         #All of the different directions and colour images
-        self.colours = ["white", "green"]
+        self.colours = ["white", "green", "blue", "yellow", "orange", "pink"]
         self.snekTiles = {}
         self.sneks = {}
         
@@ -89,8 +89,6 @@ class Battlesneku:
         self.state = 0
 
     def updateCells(self):
-        print "Updating cells"
-        
         if not self.state:
             return
             
