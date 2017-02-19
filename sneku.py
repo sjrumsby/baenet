@@ -2,28 +2,21 @@ import numpy
 from heapq import *
 
 class Sneku:
-    directions = {
-        "UP": [1, 0],
-        "DOWN": [-1, 0],
-        "LEFT": [0, -1],
-        "RIGHT": [0, 1]
-    }
-    
-    def __init__(self, x, y, dimensions, apple):
+    def __init__(self, x, y, colour, dimensions, apple):
         self.head = [x,y]
         self.body = [[x,y]]
+        self.colour = colour
         self.dimensions = dimensions
         self.apple = apple
         self.length = 1
         self.life = 100
         self.score = 0
-        self.dead = 0
+        self.dead = False
         self.lastMove = []
         self.lastTail = []
         
         #self.body = [[12, 6], [12, 5], [12, 4], [12, 3], [12, 2], [12, 1], [12, 0], [13, 0], [13, 1], [13, 2], [13, 3], [13, 4], [13, 5], [13, 6], [14, 6], [14, 7], [14, 8], [14, 9], [14, 10], [14, 11], [14, 12], [14, 13], [13, 13], [12, 13], [11, 13], [10, 13], [9, 13], [8, 13], [7, 13], [7, 14], [8, 14], [9, 14], [10, 14], [11, 14], [12, 14], [13, 14], [13, 15], [14, 15], [14, 16], [13, 16], [12, 16], [11, 16], [10, 16], [9, 16], [8, 16], [7, 16], [6, 16], [6, 15], [6, 14], [6, 13], [6, 12], [6, 11], [6, 10], [6, 9], [6, 8], [7, 8], [8, 8], [9, 8], [10, 8], [11, 8], [12, 8], [13, 8], [13, 7]]
         #self.length = len(self.body)
-        
     
     def playWithFood(self):
         #TODO: Figure out how to move around if we fucked up
@@ -32,6 +25,7 @@ class Sneku:
     
     def makeMove(self, board):
         print "====="
+        self.apple = board["apple"]
         def heuristic(a, b):
             return (b[0] - a[0]) ** 2 + (b[1] - a[1]) ** 2
     
@@ -185,4 +179,4 @@ class Sneku:
         self.apple = apple
         
     def killSnake(self):
-        self.dead = 1
+        self.dead = True

@@ -1,8 +1,4 @@
 class Cell:
-    x = None
-    y = None
-    label = None
-    
     def __init__(self, x, y):
         self.x = x
         self.y = y

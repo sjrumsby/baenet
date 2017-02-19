@@ -7,46 +7,63 @@ class Battlesneku:
 	
     def __init__(self, master):
         self.state = 0
-        self.game = Game()
+        self.numSnakes = 2
+        self.game = Game(17,17)
         self.tile_plain = tk.PhotoImage(file = "images/plain.gif")
         self.tile_apple = tk.PhotoImage(file = "images/apple.gif")
         self.snekuSelfie = tk.PhotoImage(file="images/snek.gif")
         
-        #All of the different directions
-        self.tile_body_white_start = tk.PhotoImage(file = "images/white/snekuBody_start.gif")
-        self.tile_body_white_across = tk.PhotoImage(file = "images/white/snekuBody_across.gif")
-        self.tile_body_white_up = tk.PhotoImage(file = "images/white/snekuBody_up.gif")
-        self.tile_body_white_rightUp = tk.PhotoImage(file = "images/white/snekuBody_rightUp.gif")
-        self.tile_body_white_rightDown = tk.PhotoImage(file = "images/white/snekuBody_rightDown.gif")
-        self.tile_body_white_leftUp = tk.PhotoImage(file = "images/white/snekuBody_leftUp.gif")
-        self.tile_body_white_leftDown = tk.PhotoImage(file = "images/white/snekuBody_leftDown.gif")
+        #All of the different directions and colour images
+        self.colours = ["white", "green"]
+        self.snekTiles = {}
+        self.sneks = {}
         
-        self.tile_head_white_up = tk.PhotoImage(file = "images/white/snekuHead_up.gif")
-        self.tile_head_white_down = tk.PhotoImage(file = "images/white/snekuHead_down.gif")
-        self.tile_head_white_left = tk.PhotoImage(file = "images/white/snekuHead_left.gif")
-        self.tile_head_white_right = tk.PhotoImage(file = "images/white/snekuHead_right.gif")
-
+        for c in self.colours:
+            self.snekTiles[c] = {}
+            self.snekTiles[c]["start"] = tk.PhotoImage(file = "images/" + c + "/snekuBody_start.gif"),
+            self.snekTiles[c]["horizontal"] = tk.PhotoImage(file = "images/" + c + "/snekuBody_across.gif"),
+            self.snekTiles[c]["vertical"] = tk.PhotoImage(file = "images/" + c + "/snekuBody_up.gif"),
+            self.snekTiles[c]["rightUp"] = tk.PhotoImage(file = "images/" + c + "/snekuBody_rightUp.gif"),
+            self.snekTiles[c]["rightDown"] = tk.PhotoImage(file = "images/" + c + "/snekuBody_rightDown.gif"),
+            self.snekTiles[c]["leftUp"] = tk.PhotoImage(file = "images/" + c + "/snekuBody_leftUp.gif"),
+            self.snekTiles[c]["leftDown"] = tk.PhotoImage(file = "images/" + c + "/snekuBody_leftDown.gif"),
+            self.snekTiles[c]["endUp"] = tk.PhotoImage(file = "images/" + c + "/snekuHead_up.gif"),
+            self.snekTiles[c]["endDown"] = tk.PhotoImage(file = "images/" + c + "/snekuHead_down.gif"),
+            self.snekTiles[c]["endLeft"] = tk.PhotoImage(file = "images/" + c + "/snekuHead_left.gif"),
+            self.snekTiles[c]["endRight"] = tk.PhotoImage(file = "images/" + c + "/snekuHead_right.gif")
+            
+            self.sneks[c] = {}
+            
         snekuStatusBar = tk.Frame(master).grid(row=0)
         master.grid_columnconfigure(0, weight=1)
-        master.grid_columnconfigure(self.game.width+1, weight=1)
+        #master.grid_columnconfigure(1, weight=1)
+        #master.grid_columnconfigure(self.game.width+2, weight=1)
+        master.grid_columnconfigure(self.game.width+3, weight=1)
 
-        tk.Label(snekuStatusBar, text="Life").grid(row=0, column=0, columnspan=1)
-        self.lifeLabel = tk.Label(snekuStatusBar, text="100")
-        self.lifeLabel.grid(row=1, column=0, columnspan=1)
+        tk.Label(snekuStatusBar, text="Life").grid(row=0, column=0, columnspan=2)
+        
+        for i in range(self.numSnakes):
+            colourLabel = tk.Label(snekuStatusBar, text=self.colours[i])
+            colourLabel.grid(row=1+i, column=0, columnspan=1)
+            self.sneks[self.colours[i]]["lifeLabel"] = tk.Label(snekuStatusBar, text="100")
+            self.sneks[self.colours[i]]["lifeLabel"].grid(row=1+i, column=1, columnspan=1)
 
         distinguishedSneku = tk.Button(snekuStatusBar, image=self.snekuSelfie, command=self.startGame)
         distinguishedSneku.photo = self.snekuSelfie
-        distinguishedSneku.grid(row=0, column=1, columnspan=self.game.width, rowspan=2)
+        distinguishedSneku.grid(row=0, column=2, columnspan=self.game.width, rowspan=1+self.numSnakes)
 
-        tk.Label(snekuStatusBar, text="Score").grid(row=0, column=1+self.game.width, columnspan=1)
-        self.scoreLabel = tk.Label(snekuStatusBar, text="0")
-        self.scoreLabel.grid(row=1, column=1+self.game.width, columnspan=1)
+        tk.Label(snekuStatusBar, text="Score").grid(row=0, column=2+self.game.width, columnspan=2)
+        for i in range(self.numSnakes):
+            scoreLabel = tk.Label(snekuStatusBar, text=self.colours[i])
+            scoreLabel.grid(row=1+i, column=2+self.game.width, columnspan=1)
+            self.sneks[self.colours[i]]["scoreLabel"] = tk.Label(snekuStatusBar, text="0")
+            self.sneks[self.colours[i]]["scoreLabel"].grid(row=1+i, column=3+self.game.width, columnspan=1)
 
-        tk.Label(text="").grid(row=2, column=0, columnspan=2+self.game.width)
-        self.snekuFrame = tk.Frame(master).grid(row=2)
+        tk.Label(text="").grid(row=1+self.numSnakes, column=0, columnspan=4+self.game.width)
+        self.snekuFrame = tk.Frame(master).grid(row=2+self.numSnakes)
 
-        rowOffset = 3
-        columnOffset = 1
+        rowOffset = 2 + self.numSnakes
+        columnOffset = 2
 
         for i in range(self.game.height):
             for j in range(self.game.width):
@@ -55,7 +72,7 @@ class Battlesneku:
                 tile.grid(row=rowOffset+i, column=columnOffset+j)
                 self.game.grid[i][j].label = tile
                 
-        self.snekuRights = tk.Label(text="Copyright 2017 Baenet Industries").grid(row=3+self.game.height, column=0, columnspan=2+self.game.width)
+        self.snekuRights = tk.Label(text="Copyright 2017 Baenet Industries").grid(row=rowOffset+self.game.height, column=0, columnspan=4+self.game.width)
 		
     def startGame(self):
         if self.state:
@@ -65,7 +82,7 @@ class Battlesneku:
         print "Starting game..."
         self.state = 1
         self.game.resetGame()
-        self.game.initGame()
+        self.game.initGame(self.colours, self.numSnakes)
         self.updateCells()
 
     def endGame(self):
@@ -91,27 +108,28 @@ class Battlesneku:
         
         #Add the snake
         for sneku in [x for x in self.game.snekus if x.dead == 0]:
+            
             if len(sneku.body) == 1:
-                self.game.grid[sneku.head[0]][sneku.head[1]].updateCell(self.tile_body_white_start)
+                self.game.grid[sneku.head[0]][sneku.head[1]].updateCell(self.snekTiles[sneku.colour]["start"])
                 grid[sneku.head[0]][sneku.head[1]] = 1
             elif len(sneku.body) == 2:
                 direction = [sneku.body[1][0] - sneku.body[0][0], sneku.body[1][1] - sneku.body[0][1]]
                 #Going up
                 if direction == [-1,0]:
-                    self.game.grid[sneku.body[0][0]][sneku.body[0][1]].updateCell(self.tile_body_white_up)
-                    self.game.grid[sneku.body[1][0]][sneku.body[1][1]].updateCell(self.tile_head_white_up)
+                    self.game.grid[sneku.body[0][0]][sneku.body[0][1]].updateCell(self.snekTiles[sneku.colour]["vertical"])
+                    self.game.grid[sneku.body[1][0]][sneku.body[1][1]].updateCell(self.snekTiles[sneku.colour]["endUp"])
                 #Going down
                 elif direction == [1,0]:
-                    self.game.grid[sneku.body[0][0]][sneku.body[0][1]].updateCell(self.tile_body_white_up)
-                    self.game.grid[sneku.body[1][0]][sneku.body[1][1]].updateCell(self.tile_head_white_down)
+                    self.game.grid[sneku.body[0][0]][sneku.body[0][1]].updateCell(self.snekTiles[sneku.colour]["vertical"])
+                    self.game.grid[sneku.body[1][0]][sneku.body[1][1]].updateCell(self.snekTiles[sneku.colour]["endDown"])
                 #Going left
                 elif direction == [0,-1]:
-                    self.game.grid[sneku.body[0][0]][sneku.body[0][1]].updateCell(self.tile_body_white_across)
-                    self.game.grid[sneku.body[1][0]][sneku.body[1][1]].updateCell(self.tile_head_white_left)
+                    self.game.grid[sneku.body[0][0]][sneku.body[0][1]].updateCell(self.snekTiles[sneku.colour]["horizontal"])
+                    self.game.grid[sneku.body[1][0]][sneku.body[1][1]].updateCell(self.snekTiles[sneku.colour]["endLeft"])
                 #Going right
                 elif direction == [0,1]:
-                    self.game.grid[sneku.body[0][0]][sneku.body[0][1]].updateCell(self.tile_body_white_across)
-                    self.game.grid[sneku.body[1][0]][sneku.body[1][1]].updateCell(self.tile_head_white_right)
+                    self.game.grid[sneku.body[0][0]][sneku.body[0][1]].updateCell(self.snekTiles[sneku.colour]["horizontal"])
+                    self.game.grid[sneku.body[1][0]][sneku.body[1][1]].updateCell(self.snekTiles[sneku.colour]["endRight"])
                     
                 else:
                     print "This shouldn't be possible..."
@@ -122,13 +140,13 @@ class Battlesneku:
             else:
                 initDirection = [sneku.body[0][0] - sneku.body[1][0], sneku.body[0][1] - sneku.body[1][1]]
                 if initDirection == [-1,0]:
-                    self.game.grid[sneku.body[0][0]][sneku.body[0][1]].updateCell(self.tile_head_white_up)
+                    self.game.grid[sneku.body[0][0]][sneku.body[0][1]].updateCell(self.snekTiles[sneku.colour]["endUp"])
                 elif initDirection == [1,0]:
-                    self.game.grid[sneku.body[0][0]][sneku.body[0][1]].updateCell(self.tile_head_white_down)
+                    self.game.grid[sneku.body[0][0]][sneku.body[0][1]].updateCell(self.snekTiles[sneku.colour]["endDown"])
                 elif initDirection == [0,-1]:
-                    self.game.grid[sneku.body[0][0]][sneku.body[0][1]].updateCell(self.tile_head_white_left)
+                    self.game.grid[sneku.body[0][0]][sneku.body[0][1]].updateCell(self.snekTiles[sneku.colour]["endLeft"])
                 elif initDirection == [0,1]:
-                    self.game.grid[sneku.body[0][0]][sneku.body[0][1]].updateCell(self.tile_head_white_right)
+                    self.game.grid[sneku.body[0][0]][sneku.body[0][1]].updateCell(self.snekTiles[sneku.colour]["endRight"])
                 
                 grid[sneku.body[0][0]][sneku.body[0][1]] = 1
                     
@@ -136,37 +154,37 @@ class Battlesneku:
                     moves = [[sneku.body[s][0] - sneku.body[s-1][0], sneku.body[s][1] - sneku.body[s-1][1]],[sneku.body[s+1][0] - sneku.body[s][0], sneku.body[s+1][1] - sneku.body[s][1]]]
                     
                     if moves == [[1,0],[1,0]] or moves == [[-1,0],[-1,0]]:
-                        self.game.grid[sneku.body[s][0]][sneku.body[s][1]].updateCell(self.tile_body_white_up)
+                        self.game.grid[sneku.body[s][0]][sneku.body[s][1]].updateCell(self.snekTiles[sneku.colour]["vertical"])
                         
                     elif moves == [[0,1],[0,1]] or moves == [[0,-1],[0,-1]]:
-                        self.game.grid[sneku.body[s][0]][sneku.body[s][1]].updateCell(self.tile_body_white_across)
+                        self.game.grid[sneku.body[s][0]][sneku.body[s][1]].updateCell(self.snekTiles[sneku.colour]["horizontal"])
                         
                     elif moves == [[-1,0],[0,-1]] or moves == [[0,1],[1,0]]:
-                        self.game.grid[sneku.body[s][0]][sneku.body[s][1]].updateCell(self.tile_body_white_leftDown)
+                        self.game.grid[sneku.body[s][0]][sneku.body[s][1]].updateCell(self.snekTiles[sneku.colour]["leftDown"])
                         
                     elif moves == [[-1,0],[0,1]] or moves == [[0,-1],[1,0]]:
-                        self.game.grid[sneku.body[s][0]][sneku.body[s][1]].updateCell(self.tile_body_white_rightDown)
+                        self.game.grid[sneku.body[s][0]][sneku.body[s][1]].updateCell(self.snekTiles[sneku.colour]["rightDown"])
                         
                     elif moves == [[0,1],[-1,0]] or moves == [[1,0],[0,-1]]:
-                        self.game.grid[sneku.body[s][0]][sneku.body[s][1]].updateCell(self.tile_body_white_leftUp)
+                        self.game.grid[sneku.body[s][0]][sneku.body[s][1]].updateCell(self.snekTiles[sneku.colour]["leftUp"])
                         
                     elif moves == [[0,-1],[-1,0]] or moves == [[1,0],[0,1]]:
-                        self.game.grid[sneku.body[s][0]][sneku.body[s][1]].updateCell(self.tile_body_white_rightUp)
+                        self.game.grid[sneku.body[s][0]][sneku.body[s][1]].updateCell(self.snekTiles[sneku.colour]["rightUp"])
                         
                     grid[sneku.body[s][0]][sneku.body[s][1]] = 1
                     
                 headDirection = [sneku.body[-1][0] - sneku.body[-2][0], sneku.body[-1][1] - sneku.body[-2][1]]
                 if headDirection == [-1,0]:
-                    self.game.grid[sneku.body[-1][0]][sneku.body[-1][1]].updateCell(self.tile_head_white_up)
+                    self.game.grid[sneku.body[-1][0]][sneku.body[-1][1]].updateCell(self.snekTiles[sneku.colour]["endUp"])
                 #Going down
                 elif headDirection == [1,0]:
-                    self.game.grid[sneku.body[-1][0]][sneku.body[-1][1]].updateCell(self.tile_head_white_down)
+                    self.game.grid[sneku.body[-1][0]][sneku.body[-1][1]].updateCell(self.snekTiles[sneku.colour]["endDown"])
                 #Going left
                 elif headDirection == [0,-1]:
-                    self.game.grid[sneku.body[-1][0]][sneku.body[-1][1]].updateCell(self.tile_head_white_left)
+                    self.game.grid[sneku.body[-1][0]][sneku.body[-1][1]].updateCell(self.snekTiles[sneku.colour]["endLeft"])
                 #Going right
                 elif headDirection == [0,1]:
-                    self.game.grid[sneku.body[-1][0]][sneku.body[-1][1]].updateCell(self.tile_head_white_right)
+                    self.game.grid[sneku.body[-1][0]][sneku.body[-1][1]].updateCell(self.snekTiles[sneku.colour]["endRight"])
                     
                 grid[sneku.body[-1][0]][sneku.body[-1][1]] = 1
                         
@@ -175,14 +193,15 @@ class Battlesneku:
             for j in range(self.game.width):
                 if grid[i][j] == 0:
                     self.game.grid[i][j].updateCell(self.tile_plain)
-					
-		self.lifeLabel.configure(text=self.game.snekus[0].life)
-		self.scoreLabel.configure(text=self.game.snekus[0].score)
+		
+        for sneku in self.game.snekus:
+            self.sneks[sneku.colour]["lifeLabel"].configure(text=sneku.life)
+            self.sneks[sneku.colour]["scoreLabel"].configure(text=sneku.score)
         
-		stillHungry = 0
-		for sneku in self.game.snekus:
-			if sneku.dead == 0:
-				stillHungry = 1
+        stillHungry = 0
+        for sneku in self.game.snekus:
+            if sneku.dead == 0:
+                stillHungry = 1
          
         if not stillHungry:
             if self.state == 1:
@@ -193,29 +212,17 @@ class Battlesneku:
         if self.state != 1:
             return
         
-        for s in self.game.snekus:
-            move_st = time()
-            move = s.makeMove(self.game.getBoard())
-            move_et = time()
+        for sneku in self.game.snekus:
+            if sneku.dead == False:
+                move = sneku.makeMove(self.game.getBoard())
         
-        board_st = time()
         self.game.updateBoard()
-        board_et = time()
-        
-        cells_st = time()
         self.updateCells()
-        cells_et = time()
-        
-        moves_time = move_et - move_st
-        board_time = board_et - board_st
-        cells_time = cells_et - cells_st
-        total_time = moves_time + board_time + cells_time
-        
-        #print "Total: %s. Move: %s. Board %s. Cells: %s" % (total_time, moves_time, board_time, cells_time)
+
 		
 def Refresher(snekGame):
     snekGame.hssst()
-    root.after(50, Refresher, snekGame)
+    root.after(75, Refresher, snekGame)
 
 root = tk.Tk()
 root.title("Sneku Feeding!")

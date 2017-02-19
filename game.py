@@ -3,9 +3,9 @@ from sneku import *
 import random
 
 class Game:
-    def __init__(self):
-        self.height = 17
-        self.width = 17
+    def __init__(self, height = 17, width = 17):
+        self.height = height
+        self.width = width
         self.apple = []
         self.snekus = []
         self.grid = []
@@ -25,23 +25,20 @@ class Game:
                 row.append(c)
             self.grid.append(row)
             
-    def initGame(self):
+    def initGame(self, colours, numSnakes):
         tastyTuna = self.getRandomCoords()
+        self.colours = colours
+        snakePos = []
         
-        snakeHouse = self.getRandomCoords()
-        while snakeHouse == tastyTuna:
+        for i in range(numSnakes):
+        
             snakeHouse = self.getRandomCoords()
+            while snakeHouse == tastyTuna or snakeHouse in snakePos:
+                snakeHouse = self.getRandomCoords()
             
-        sneku = Sneku(snakeHouse[0], snakeHouse[1], (self.height, self.width), tastyTuna)
-        self.snekus.append(sneku)
+            sneku = Sneku(snakeHouse[0], snakeHouse[1], colours[i], (self.height, self.width), tastyTuna)
+            self.snekus.append(sneku)
         self.apple = tastyTuna
-        
-        #snakeHouse = [0,13]
-        #tastyTuna = [15,16]
-        #sneku = Sneku(snakeHouse[0], snakeHouse[1], (self.height, self.width), tastyTuna)
-        #self.snekus = []
-        #self.snekus.append(sneku)
-        #self.apple = tastyTuna
         
         print "Start game... apple: %s. snake: %s" % (self.apple, snakeHouse)
         
@@ -58,8 +55,13 @@ class Game:
         
     def spawnNewApple(self):
         tastyTuna = self.getRandomCoords()
-        
-        while tastyTuna == self.apple or tastyTuna in self.snekus[0].body:
+        snekuBodies = []
+        for sneku in self.snekus:
+            for s in sneku.body:
+                snekuBodies.append(s)
+                
+        #Make sure we don't spawn the tuna on s sneku!
+        while tastyTuna == self.apple or tastyTuna in snekuBodies:
             tastyTuna = self.getRandomCoords()
 
         self.apple = tastyTuna
@@ -67,17 +69,27 @@ class Game:
         
     def updateBoard(self):
         for sneku in self.snekus:
+            otherSnekus = [s for s in self.snekus if s != sneku and s.dead == False]
+            
+            #If we stepped outside the board
             if sneku.head[0] < 0 or sneku.head[0] >= self.height:
                 sneku.killSnake()
             if sneku.head[1] < 0 or sneku.head[1] >= self.width:
                 sneku.killSnake()
             
+            #If our life reaches zero
             if sneku.life <= 0:
                 sneku.killSnake()
             
+            #If we stepped on ourself
             if len([x for x in sneku.body if sneku.body.count(x) > 1]):
                 sneku.killSnake()
         
+            #If we stepped onto someone else
+            for o in otherSnekus:
+                if sneku.head in o.body:
+                    sneku.killSnake()
+            
             if sneku.head == self.apple:
                 self.spawnNewApple()
                 sneku.eatApple(self.apple)
@@ -92,7 +104,8 @@ class Game:
         }
         
         for sneku in self.snekus:
-            board['snekus'].append(sneku.body)
+            if sneku.dead == False:
+                board['snekus'].append(sneku.body)
             
         return board
                 
