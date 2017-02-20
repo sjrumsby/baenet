@@ -5,17 +5,16 @@ import yaml
 
 class Battlesneku:
 	
-    def __init__(self, master):
-    	config = yaml.safe_load(open("snektributes.yml"))
+    def __init__(self, master, numSnakes, colours):
         self.state = 0
-        self.numSnakes = config['numSnakes']
+        self.numSnakes = numSnakes
         self.game = Game(17,17)
         self.tile_plain = tk.PhotoImage(file = "images/plain.gif")
         self.tile_apple = tk.PhotoImage(file = "images/apple.gif")
         self.snekuSelfie = tk.PhotoImage(file="images/snek.gif")
         
         #All of the different directions and colour images
-        self.colours = config['colours']
+        self.colours = colours
         self.snekTiles = {}
         self.sneks = {}
         
@@ -218,14 +217,15 @@ class Battlesneku:
         self.game.updateBoard()
         self.updateCells()
 
-		
+config = yaml.safe_load(open("snektributes.yml"))
+
 def Refresher(snekGame):
     snekGame.hssst()
-    root.after(75, Refresher, snekGame)
+    root.after(config['tickRate'], Refresher, snekGame)
 
 root = tk.Tk()
 root.title("Sneku Feeding!")
 
-snek = Battlesneku(root)
+snek = Battlesneku(root, config['numSnakes'], config['colours'])
 Refresher(snek)
 root.mainloop()
