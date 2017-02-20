@@ -1,71 +1,68 @@
-import numpy
+from numpy import array as numpyArray
 from heapq import *
 
 class Sneku:
-    def __init__(self, x, y, colour, dimensions, apple):
+    def __init__(self, x, y, colour, dimensions):
         self.head = [x,y]
         self.body = [[x,y]]
         self.colour = colour
         self.dimensions = dimensions
-        self.apple = apple
         self.length = 1
         self.life = 100
         self.score = 0
         self.dead = False
         self.lastMove = []
-        self.lastTail = []
-    
-    def makeMove(self, board):
-        self.apple = board["apple"]
         
-        def heuristic(a, b):
-            return (b[0] - a[0]) ** 2 + (b[1] - a[1]) ** 2
+    def heuristic(self, a, b):
+        return (b[0] - a[0]) ** 2 + (b[1] - a[1]) ** 2
     
-        def astar(array, start, goal):
-            neighbors = [(0,1),(1,0),(0,-1),(-1,0)]
-    
-            close_set = set()
-            came_from = {}
-            gscore = {start:0}
-            fscore = {start:heuristic(start, goal)}
-            oheap = []
-    
-            heappush(oheap, (fscore[start], start))
-            
-            while oheap:
-                current = heappop(oheap)[1]
+    def astar(self, array, start, goal):
+        neighbors = [(0,1),(0,-1),(1,0),(-1,0)]
+
+        close_set = set()
+        came_from = {}
+        gscore = {start:0}
+        fscore = {start:self.heuristic(start, goal)}
+        oheap = []
+
+        heappush(oheap, (fscore[start], start))
         
-                if current == goal:
-                    data = []
-                    while current in came_from:
-                        data.append(current)
-                        current = came_from[current]
-                    return data
-        
-                close_set.add(current)
-                for i, j in neighbors:
-                    neighbor = current[0] + i, current[1] + j            
-                    tentative_g_score = gscore[current] + heuristic(current, neighbor)
-                    if 0 <= neighbor[0] < array.shape[0]:
-                        if 0 <= neighbor[1] < array.shape[1]:                
-                            if array[neighbor[0]][neighbor[1]] == 1:
-                                continue
-                        else:
+        while oheap:
+            current = heappop(oheap)[1]
+    
+            if current == goal:
+                data = []
+                while current in came_from:
+                    data.append(current)
+                    current = came_from[current]
+                return data
+    
+            close_set.add(current)
+            for i, j in neighbors:
+                neighbor = current[0] + i, current[1] + j            
+                tentative_g_score = gscore[current] + self.heuristic(current, neighbor)
+                if 0 <= neighbor[0] < array.shape[0]:
+                    if 0 <= neighbor[1] < array.shape[1]:                
+                        if array[neighbor[0]][neighbor[1]] == 1:
                             continue
                     else:
                         continue
-                    
-                    if neighbor in close_set and tentative_g_score >= gscore.get(neighbor, 0):
-                        continue
-                    
-                    if  tentative_g_score < gscore.get(neighbor, 0) or neighbor not in [i[1]for i in oheap]:
-                        came_from[neighbor] = current
-                        gscore[neighbor] = tentative_g_score
-                        fscore[neighbor] = tentative_g_score + heuristic(neighbor, goal)
-                        heappush(oheap, (fscore[neighbor], neighbor))
-                    
-            return False
+                else:
+                    continue
+                
+                if neighbor in close_set and tentative_g_score >= gscore.get(neighbor, 0):
+                    continue
+                
+                if  tentative_g_score < gscore.get(neighbor, 0) or neighbor not in [i[1]for i in oheap]:
+                    came_from[neighbor] = current
+                    gscore[neighbor] = tentative_g_score
+                    fscore[neighbor] = tentative_g_score + self.heuristic(neighbor, goal)
+                    heappush(oheap, (fscore[neighbor], neighbor))
+                
+        return False
     
+    def makeMove(self, board):
+        apple = board["apple"]
         grid = []
         
         for row in range(board['height']):
@@ -80,19 +77,19 @@ class Sneku:
                 gridRow.append(g)
             grid.append(gridRow)
         
-        tuna = tuple(self.apple)
+        tuna = tuple(apple)
         head = tuple(self.head)
         tail = tuple(self.body[0])
         
         tunaGrid = list(grid)
         tunaGrid[tail[0]][tail[1]] = 0
         
-        nmap = numpy.array(grid)
-        tunaMap = numpy.array(tunaGrid)
+        nmap = numpyArray(grid)
+        tunaMap = numpyArray(tunaGrid)
         
-        headToTuna = astar(nmap, head, tuna)
-        headToTail = astar(tunaMap, head, tail)
-        tunaToTail = astar(tunaMap, tuna, tail)
+        headToTuna = self.astar(nmap, head, tuna)
+        headToTail = self.astar(tunaMap, head, tail)
+        tunaToTail = self.astar(tunaMap, tuna, tail)
         
         if tunaToTail:
             if headToTuna:
@@ -128,8 +125,8 @@ class Sneku:
         self.head[1] += move[1]
         self.body.append(self.head[:])
         self.life -= 1
+        
         if len(self.body) > self.length:
-            self.lastTail = self.body[0]
             self.body = self.body[1:]
         
         self.lastMove = move
@@ -151,11 +148,10 @@ class Sneku:
         return True
         
     
-    def eatApple(self, apple):
+    def eatApple(self):
         self.length += 2
         self.life = 100
         self.score += 1
-        self.apple = apple
         
     def killSneku(self):
         self.dead = True

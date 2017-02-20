@@ -1,38 +1,39 @@
 import Tkinter as tk
 import tkMessageBox
 from game import *
-from time import sleep, time
+import yaml
 
 class Battlesneku:
 	
     def __init__(self, master):
+    	config = yaml.safe_load(open("snektributes.yml"))
         self.state = 0
-        self.numSnakes = 6
+        self.numSnakes = config['numSnakes']
         self.game = Game(17,17)
         self.tile_plain = tk.PhotoImage(file = "images/plain.gif")
         self.tile_apple = tk.PhotoImage(file = "images/apple.gif")
         self.snekuSelfie = tk.PhotoImage(file="images/snek.gif")
         
         #All of the different directions and colour images
-        self.colours = ["white", "green", "blue", "yellow", "orange", "pink"]
+        self.colours = config['colours']
         self.snekTiles = {}
         self.sneks = {}
         
-        for c in self.colours:
-            self.snekTiles[c] = {}
-            self.snekTiles[c]["start"] = tk.PhotoImage(file = "images/" + c + "/snekuBody_start.gif"),
-            self.snekTiles[c]["horizontal"] = tk.PhotoImage(file = "images/" + c + "/snekuBody_across.gif"),
-            self.snekTiles[c]["vertical"] = tk.PhotoImage(file = "images/" + c + "/snekuBody_up.gif"),
-            self.snekTiles[c]["rightUp"] = tk.PhotoImage(file = "images/" + c + "/snekuBody_rightUp.gif"),
-            self.snekTiles[c]["rightDown"] = tk.PhotoImage(file = "images/" + c + "/snekuBody_rightDown.gif"),
-            self.snekTiles[c]["leftUp"] = tk.PhotoImage(file = "images/" + c + "/snekuBody_leftUp.gif"),
-            self.snekTiles[c]["leftDown"] = tk.PhotoImage(file = "images/" + c + "/snekuBody_leftDown.gif"),
-            self.snekTiles[c]["endUp"] = tk.PhotoImage(file = "images/" + c + "/snekuHead_up.gif"),
-            self.snekTiles[c]["endDown"] = tk.PhotoImage(file = "images/" + c + "/snekuHead_down.gif"),
-            self.snekTiles[c]["endLeft"] = tk.PhotoImage(file = "images/" + c + "/snekuHead_left.gif"),
-            self.snekTiles[c]["endRight"] = tk.PhotoImage(file = "images/" + c + "/snekuHead_right.gif")
+        for i in range(self.numSnakes):
+            self.snekTiles[self.colours[i]] = {}
+            self.snekTiles[self.colours[i]]["start"] = tk.PhotoImage(file = "images/" + self.colours[i] + "/snekuBody_start.gif"),
+            self.snekTiles[self.colours[i]]["horizontal"] = tk.PhotoImage(file = "images/" + self.colours[i] + "/snekuBody_across.gif"),
+            self.snekTiles[self.colours[i]]["vertical"] = tk.PhotoImage(file = "images/" + self.colours[i] + "/snekuBody_up.gif"),
+            self.snekTiles[self.colours[i]]["rightUp"] = tk.PhotoImage(file = "images/" + self.colours[i] + "/snekuBody_rightUp.gif"),
+            self.snekTiles[self.colours[i]]["rightDown"] = tk.PhotoImage(file = "images/" + self.colours[i] + "/snekuBody_rightDown.gif"),
+            self.snekTiles[self.colours[i]]["leftUp"] = tk.PhotoImage(file = "images/" + self.colours[i] + "/snekuBody_leftUp.gif"),
+            self.snekTiles[self.colours[i]]["leftDown"] = tk.PhotoImage(file = "images/" + self.colours[i] + "/snekuBody_leftDown.gif"),
+            self.snekTiles[self.colours[i]]["endUp"] = tk.PhotoImage(file = "images/" + self.colours[i] + "/snekuHead_up.gif"),
+            self.snekTiles[self.colours[i]]["endDown"] = tk.PhotoImage(file = "images/" + self.colours[i] + "/snekuHead_down.gif"),
+            self.snekTiles[self.colours[i]]["endLeft"] = tk.PhotoImage(file = "images/" + self.colours[i] + "/snekuHead_left.gif"),
+            self.snekTiles[self.colours[i]]["endRight"] = tk.PhotoImage(file = "images/" + self.colours[i] + "/snekuHead_right.gif")
             
-            self.sneks[c] = {}
+            self.sneks[self.colours[i]] = {}
             
         snekuStatusBar = tk.Frame(master).grid(row=0)
         master.grid_columnconfigure(0, weight=1)

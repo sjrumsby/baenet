@@ -1,6 +1,6 @@
 from cell import *
 from sneku import *
-import random
+from random import randint
 
 class Game:
     def __init__(self, height = 17, width = 17):
@@ -14,14 +14,6 @@ class Game:
             row = []
             for j in range(self.width):
                 c = Cell(i,j)
-                
-                for sneku in self.snekus:
-                    if [i,j] in sneku.body:
-                        c.content = 1
-                    
-                if [i,j] == self.apple:
-                    c.content = -1
-                    
                 row.append(c)
             self.grid.append(row)
             
@@ -36,7 +28,7 @@ class Game:
             while snakeHouse == tastyTuna or snakeHouse in snakePos:
                 snakeHouse = self.getRandomCoords()
             
-            sneku = Sneku(snakeHouse[0], snakeHouse[1], colours[i], (self.height, self.width), tastyTuna)
+            sneku = Sneku(snakeHouse[0], snakeHouse[1], colours[i], (self.height, self.width))
             self.snekus.append(sneku)
         self.apple = tastyTuna
         
@@ -49,16 +41,17 @@ class Game:
         self.snekus = []
         
     def getRandomCoords(self):
-        x = random.randint(0,self.height - 1)
-        y = random.randint(0,self.width - 1)
+        x = randint(0,self.height - 1)
+        y = randint(0,self.width - 1)
         return [x,y]
         
     def spawnNewApple(self):
         tastyTuna = self.getRandomCoords()
         snekuBodies = []
         for sneku in self.snekus:
-            for s in sneku.body:
-                snekuBodies.append(s)
+            if sneku.dead == False:
+                for s in sneku.body:
+                    snekuBodies.append(s)
                 
         #Make sure we don't spawn the tuna on s sneku!
         while tastyTuna == self.apple or tastyTuna in snekuBodies:
@@ -96,8 +89,8 @@ class Game:
             for o in otherSnekus:
                 if sneku.head in o.body:
                     if sneku.head == o.head:
-                        if len(sneku.body) < len(o.body):
-                            print "(%s) SNEK DOWN... Ran into the head of other sneku (%s) and is smaller" % (sneku.colour, o.colour)
+                        if len(sneku.body) <= len(o.body):
+                            print "(%s) SNEK DOWN... Ran into the head of other sneku (%s) and is smaller or equal size" % (sneku.colour, o.colour)
                             sneksToKill.append(sneku)
                     else:
                         print "(%s) SNEK DOWN... Ran into the body of other sneku (%s)" % (sneku.colour, o.colour)
@@ -105,7 +98,7 @@ class Game:
             
             if sneku.head == self.apple:
                 self.spawnNewApple()
-                sneku.eatApple(self.apple)
+                sneku.eatApple()
        
         for soonToBeDeadSneku in sneksToKill:
             soonToBeDeadSneku.killSneku()
