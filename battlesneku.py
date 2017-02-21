@@ -35,7 +35,7 @@ class Battlesneku:
             self.sneks[self.colours[i]] = {}
             
         snekuStatusBar = tk.Frame(master).grid(row=0)
-        master.grid_columnconfigure(0, weight=1)
+        master.grid_columnconfigure(1, weight=1)
         #master.grid_columnconfigure(1, weight=1)
         #master.grid_columnconfigure(self.game.width+2, weight=1)
         master.grid_columnconfigure(self.game.width+3, weight=1)
@@ -45,7 +45,7 @@ class Battlesneku:
         for i in range(self.numSnakes):
             colourLabel = tk.Label(snekuStatusBar, text=self.colours[i])
             colourLabel.grid(row=1+i, column=0, columnspan=1)
-            self.sneks[self.colours[i]]["lifeLabel"] = tk.Label(snekuStatusBar, text="100")
+            self.sneks[self.colours[i]]["lifeLabel"] = tk.Label(snekuStatusBar, text="100", width=3)
             self.sneks[self.colours[i]]["lifeLabel"].grid(row=1+i, column=1, columnspan=1)
 
         distinguishedSneku = tk.Button(snekuStatusBar, image=self.snekuSelfie, command=self.startGame)
