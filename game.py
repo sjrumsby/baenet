@@ -17,9 +17,11 @@ class Game:
                 row.append(c)
             self.grid.append(row)
             
-    def initGame(self, colours, numSnakes):
+    def initGame(self, colours, numSnakes, appleMax = 5, appleRate = 5):
         tastyTuna = self.getRandomCoords()
         self.colours = colours
+        self.appleMax = appleMax
+        self.appleRate = appleRate
         snakePos = []
         
         for i in range(numSnakes):
@@ -106,8 +108,8 @@ class Game:
             soonToBeDeadSneku.killSneku()
 
         # Spawn new apples at random, or if at 0 apples
-        if randint(0,5) == 0 or len(self.apples) == 0:
-            if len(self.apples) < 5:
+        if randint(0, self.appleRate) == 0 or len(self.apples) == 0:
+            if len(self.apples) < self.appleMax:
                 self.spawnNewApple()
             
     def getBoard(self):

@@ -82,7 +82,7 @@ class Battlesneku:
         print "Starting game..."
         self.state = 1
         self.game.resetGame()
-        self.game.initGame(self.colours, self.numSnakes)
+        self.game.initGame(self.colours, self.numSnakes, config['appleMax'], config['appleRate'])
         self.updateCells()
 
     def endGame(self):
