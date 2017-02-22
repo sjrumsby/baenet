@@ -100,9 +100,10 @@ class Battlesneku:
                 row.append(0)
             grid.append(row)
         
-        #Add the apple
-        self.game.grid[self.game.apple[0]][self.game.apple[1]].updateCell(self.tile_apple)
-        grid[self.game.apple[0]][self.game.apple[1]] = 1
+        #Add the apples
+        for apple in self.game.apples:
+            self.game.grid[apple[0]][apple[1]].updateCell(self.tile_apple)
+            grid[apple[0]][apple[1]] = 1
         
         #Add the snake
         for sneku in [x for x in self.game.snekus if x.dead == 0]:

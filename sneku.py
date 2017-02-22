@@ -60,9 +60,24 @@ class Sneku:
                     heappush(oheap, (fscore[neighbor], neighbor))
                 
         return False
+
+    def getClosestApple(self, board):
+        apples = board["apples"]
+        # Loop through apples and return close one to us
+        closestApple = [0, 0]
+        distance = 9999
+        for apple in apples:
+            currentDistance = self.heuristic(self.head, apple)
+            if  currentDistance < distance:
+                distance = currentDistance
+                closestApple = apple
+        if closestApple == [0, 0]: 
+            print "No apple near us! Need to do further logic"
+        return closestApple
+
     
     def makeMove(self, board):
-        apple = board["apple"]
+        apple = self.getClosestApple(board)
         grid = []
         
         for row in range(board['height']):
