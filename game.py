@@ -3,12 +3,14 @@ from sneku import *
 from random import randint
 
 class Game:
-    def __init__(self, height = 17, width = 17):
+    def __init__(self, height = 17, width = 17, appleMax = 5, appleRate = 5):
         self.height = height
         self.width = width
         self.apples = [[]]
         self.snekus = []
         self.grid = []
+        self.appleMax = appleMax
+        self.appleRate = appleRate
         
         for i in range(self.height):
             row = []
@@ -17,11 +19,9 @@ class Game:
                 row.append(c)
             self.grid.append(row)
             
-    def initGame(self, colours, numSnakes, appleMax = 5, appleRate = 5):
+    def initGame(self, colours, numSnakes):
         tastyTuna = self.getRandomCoords()
         self.colours = colours
-        self.appleMax = appleMax
-        self.appleRate = appleRate
         snakePos = []
         
         for i in range(numSnakes):

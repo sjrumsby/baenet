@@ -5,10 +5,10 @@ import yaml
 
 class Battlesneku:
 	
-    def __init__(self, master, numSnakes, colours):
+    def __init__(self, master, numSnakes, colours, appleMax, appleRate):
         self.state = 0
         self.numSnakes = numSnakes
-        self.game = Game(17,17)
+        self.game = Game(17, 17, appleMax, appleRate)
         self.tile_plain = tk.PhotoImage(file = "images/plain.gif")
         self.tile_apple = tk.PhotoImage(file = "images/apple.gif")
         self.snekuSelfie = tk.PhotoImage(file="images/snek.gif")
@@ -82,7 +82,7 @@ class Battlesneku:
         print "Starting game..."
         self.state = 1
         self.game.resetGame()
-        self.game.initGame(self.colours, self.numSnakes, config['appleMax'], config['appleRate'])
+        self.game.initGame(self.colours, self.numSnakes)
         self.updateCells()
 
     def endGame(self):
@@ -227,6 +227,6 @@ def Refresher(snekGame):
 root = tk.Tk()
 root.title("Sneku Feeding!")
 
-snek = Battlesneku(root, config['numSnakes'], config['colours'])
+snek = Battlesneku(root, config['numSnakes'], config['colours'], config['appleMax'], config['appleRate'])
 Refresher(snek)
 root.mainloop()
