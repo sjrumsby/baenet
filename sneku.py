@@ -14,7 +14,7 @@ class Sneku:
         self.lastMove = []
         
     def heuristic(self, a, b):
-        return (b[0] - a[0]) ** 2 + (b[1] - a[1]) ** 2
+        return abs(b[0] - a[0]) + abs(b[1] - a[1])
     
     def astar(self, array, start, goal):
         neighbors = [(0,1),(0,-1),(1,0),(-1,0)]
