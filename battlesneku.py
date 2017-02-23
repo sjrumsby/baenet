@@ -1,13 +1,18 @@
+import json
+import sys
 import Tkinter as tk
 import tkMessageBox
-from game import *
 import yaml
+
+from game import *
+
 
 class Battlesneku:
 	
-    def __init__(self, master, snekNames, numSnakes, colours, appleMax, appleRate):
+    def __init__(self, master, snekNames, numSnakes, colours, appleMax, appleRate, loadState):
         self.state = 0
         self.numSnakes = numSnakes
+        self.loadState = loadState
         self.game = Game(snekNames, 17, 17, appleMax, appleRate)
         self.tile_plain = tk.PhotoImage(file = "images/plain.gif")
         self.tile_apple = tk.PhotoImage(file = "images/apple.gif")
@@ -36,8 +41,6 @@ class Battlesneku:
             
         snekuStatusBar = tk.Frame(master).grid(row=0)
         master.grid_columnconfigure(1, weight=1)
-        #master.grid_columnconfigure(1, weight=1)
-        #master.grid_columnconfigure(self.game.width+2, weight=1)
         master.grid_columnconfigure(self.game.width+3, weight=1)
 
         tk.Label(snekuStatusBar, text="Life").grid(row=0, column=0, columnspan=2)
@@ -80,9 +83,15 @@ class Battlesneku:
             return
 
         print "Starting game..."
-        self.state = 1
         self.game.resetGame()
-        self.game.initGame(self.colours, self.numSnakes)
+        
+        if self.loadState:
+            print "Loading game from saved state"
+            self.game.loadState(loadState)
+        else:
+            self.game.initGame(self.colours, self.numSnakes)
+            
+        self.state = 1
         self.updateCells()
 
     def endGame(self):
@@ -217,13 +226,6 @@ class Battlesneku:
 
 config = yaml.safe_load(open("snektributes.yml"))
 
-def Refresher(snekGame):
-    snekGame.hssst()
-    root.after(config['tickRate'], Refresher, snekGame)
-
-root = tk.Tk()
-root.title("Sneku Feeding!")
-
 try:
     snekNames = config['snekNames']
 except KeyError:
@@ -249,6 +251,23 @@ try:
 except KeyError:
     appleRate = 10
 
-snek = Battlesneku(root, snekNames, numSnakes, colours, appleMax, appleRate)
+def Refresher(snekGame):
+    snekGame.hssst()
+    root.after(config['tickRate'], Refresher, snekGame)
+
+root = tk.Tk()
+root.title("Sneku Feeding!")
+loadState = None
+
+if len(sys.argv) == 2:
+    try:
+        fileName = sys.argv[1]
+        f = open(fileName)
+        loadState = json.loads(''.join(f.readlines()))
+    except IOError:
+        print "Error: no file named %s" % fileName
+        print "Continuing with new game..."
+
+snek = Battlesneku(root, snekNames, numSnakes, colours, appleMax, appleRate, loadState)
 Refresher(snek)
 root.mainloop()

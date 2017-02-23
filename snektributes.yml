@@ -4,3 +4,4 @@ tickRate: 100
 appleMax: 3
 appleRate: 10
 snekNames: ["classic", "diagonal", "scaredy"]
+snekLog: "snek.log"

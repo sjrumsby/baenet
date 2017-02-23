@@ -3,6 +3,9 @@ from heapq import *
 from sneku import *
 
 class diagonalSneku(Sneku):
+    def getType(self):
+        return "diagonal"
+        
     def heuristic(self, a, b):
         return (b[0] - a[0]) ** 2 + (b[1] - a[1]) ** 2
     

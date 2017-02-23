@@ -3,6 +3,9 @@ from heapq import *
 from sneku import Sneku
 
 class classicSneku(Sneku):
+    def getType(self):
+        return "classic"
+        
     def heuristic(self, a, b):
         return abs(b[0] - a[0]) + abs(b[1] - a[1])
     

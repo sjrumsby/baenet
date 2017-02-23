@@ -5,6 +5,16 @@ from diagonalSneku import *
 from scaredySneku import *
 from random import randint
 
+import json
+import logging
+
+logger = logging.getLogger('battlesneku')
+hdlr = logging.FileHandler('hssssst.log')
+#formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
+#hdlr.setFormatter(formatter)
+logger.addHandler(hdlr) 
+logger.setLevel(logging.INFO)
+
 class Game:
     def __init__(self, snekNames, height = 17, width = 17, appleMax = 5, appleRate = 5):
         self.snekNames = snekNames
@@ -15,6 +25,7 @@ class Game:
         self.grid = []
         self.appleMax = appleMax
         self.appleRate = appleRate
+        self.tick = 0
         
         for i in range(self.height):
             row = []
@@ -56,6 +67,35 @@ class Game:
         
         print "Start game... apples: %s. snake: %s" % (self.apples, snakeHouse)
         
+    def loadState(self, board):
+        print board
+        self.height = board['height']
+        self.width = board['width']
+        self.tick = board['tick']
+        self.apples = board['apples']
+        self.appleMax = board['appleMax']
+        self.appleRate = board['appleRate']
+        
+        for key, value in board['snekus'].iteritems():
+            if value["type"] == "classic":
+                sneku = classicSneku(value["head"][0], value["head"][1], key, (self.height, self.width))
+                sneku.body = value["body"]
+                sneku.score = value["score"]
+                sneku.life = value["life"]
+            elif value["type"] == "diagonal":
+                sneku = diagonalSneku(value["head"][0], value["head"][1], key, (self.height, self.width))
+                sneku.body = value["body"]
+                sneku.score = value["score"]
+                sneku.life = value["life"]
+            elif value["type"] == "scaredy":
+                sneku = scaredySneku(value["head"][0], value["head"][1], key, (self.height, self.width))
+                sneku.body = value["body"]
+                sneku.score = value["score"]
+                sneku.life = value["life"]
+                
+            self.snekus.append(sneku)
+        
+        
     def resetGame(self):
         self.life = 100
         self.score = 0
@@ -83,19 +123,22 @@ class Game:
         print "New apple spawned at: %s" % tastyTuna
         
     def makeMoves(self):
+        board = self.getBoard()
+        logger.info(json.dumps(board))
         for sneku in self.snekus:
             if sneku.dead == False:
-                m = sneku.makeMove(self.getBoard())
+                m = sneku.makeMove(board)
                 newPos = [sneku.head[0] + m[0], sneku.head[1] + m[1]]
                 sneku.body.append(newPos)
-                print "(%s): %s" % (sneku.colour, m)
+                #print "(%s): %s" % (sneku.colour, m)
         
     def updateBoard(self):
         for sneku in self.snekus:
             if len(sneku.body) > sneku.length:
                 sneku.body = sneku.body[1:]
             sneku.head = sneku.body[-1]
-            sneku.life -= 1
+            if sneku.dead == False:
+                sneku.life -= 1
                 
         sneksToKill = []
         aliveSnekus =  [s for s in self.snekus if s.dead == False]
@@ -145,13 +188,18 @@ class Game:
         if randint(0, self.appleRate) == 0 or len(self.apples) == 0:
             if len(self.apples) < self.appleMax:
                 self.spawnNewApple()
+                
+        self.tick += 1
             
     def getBoard(self):
         board = {
             "height": self.height,
             "width": self.width,
             "apples": self.apples,
-            "snekus": {}
+            "snekus": {},
+            "tick": self.tick,
+            "appleMax": self.appleMax,
+            "appleRate": self.appleRate,
         }
         
         for sneku in self.snekus:
@@ -160,7 +208,8 @@ class Game:
                     "body": sneku.body,
                     "head": sneku.head,
                     "score": sneku.score,
-                    "life": sneku.life
+                    "life": sneku.life,
+                    "type": sneku.getType(),
                 }
             
         return board

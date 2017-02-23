@@ -3,6 +3,9 @@ from heapq import *
 from random import randint
 
 class Sneku:
+    def getType(self):
+        return ""
+        
     def __init__(self, x, y, colour, dimensions):
         self.head = [x,y]
         self.body = [[x,y]]
