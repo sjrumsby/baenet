@@ -1,4 +1,5 @@
-numSnakes: 2
+numSnakes: 6
 colours: ["white", "green", "blue", "yellow", "orange", "pink"]
 tickRate: 100
-
+appleMax: 5
+appleRate: 5

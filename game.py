@@ -3,12 +3,14 @@ from sneku import *
 from random import randint
 
 class Game:
-    def __init__(self, height = 17, width = 17):
+    def __init__(self, height = 17, width = 17, appleMax = 5, appleRate = 5):
         self.height = height
         self.width = width
-        self.apple = []
+        self.apples = [[]]
         self.snekus = []
         self.grid = []
+        self.appleMax = appleMax
+        self.appleRate = appleRate
         
         for i in range(self.height):
             row = []
@@ -30,14 +32,14 @@ class Game:
             
             sneku = Sneku(snakeHouse[0], snakeHouse[1], colours[i], (self.height, self.width))
             self.snekus.append(sneku)
-        self.apple = tastyTuna
+        self.apples = [tastyTuna]
         
-        print "Start game... apple: %s. snake: %s" % (self.apple, snakeHouse)
+        print "Start game... apples: %s. snake: %s" % (self.apples, snakeHouse)
         
     def resetGame(self):
         self.life = 100
         self.score = 0
-        self.apple = []
+        self.apples = [[]]
         self.snekus = []
         
     def getRandomCoords(self):
@@ -54,10 +56,10 @@ class Game:
                     snekuBodies.append(s)
                 
         #Make sure we don't spawn the tuna on s sneku!
-        while tastyTuna == self.apple or tastyTuna in snekuBodies:
+        while tastyTuna in self.apples or tastyTuna in snekuBodies:
             tastyTuna = self.getRandomCoords()
 
-        self.apple = tastyTuna
+        self.apples.append(tastyTuna)
         print "New apple spawned at: %s" % tastyTuna
         
     def updateBoard(self):
@@ -96,18 +98,25 @@ class Game:
                         print "(%s) SNEK DOWN... Ran into the body of other sneku (%s)" % (sneku.colour, o.colour)
                         sneksToKill.append(sneku)
             
-            if sneku.head == self.apple:
-                self.spawnNewApple()
-                sneku.eatApple()
+            # Check to see if the snek is getting any apple
+            for apple in self.apples: 
+                if sneku.head == apple:
+                    self.apples.remove(sneku.head)
+                    sneku.eatApple()
        
         for soonToBeDeadSneku in sneksToKill:
             soonToBeDeadSneku.killSneku()
+
+        # Spawn new apples at random, or if at 0 apples
+        if randint(0, self.appleRate) == 0 or len(self.apples) == 0:
+            if len(self.apples) < self.appleMax:
+                self.spawnNewApple()
             
     def getBoard(self):
         board = {
             "height": self.height,
             "width": self.width,
-            "apple": self.apple,
+            "apples": self.apples,
             "snekus": []
         }
         
