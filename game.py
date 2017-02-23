@@ -152,7 +152,12 @@ class Game:
         
         for sneku in self.snekus:
             if sneku.dead == False:
-                board['snekus'][sneku.colour] = sneku.body
+                board['snekus'][sneku.colour] = {
+                    "body": sneku.body,
+                    "head": sneku.head,
+                    "score": sneku.score,
+                    "life": sneku.life
+                }
             
         return board
                 

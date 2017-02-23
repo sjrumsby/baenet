@@ -78,7 +78,7 @@ class Sneku:
 
     
     def makeMove(self, board):
-        self.body = board["snekus"][self.colour]
+        self.body = board["snekus"][self.colour]["body"]
         self.head = self.body[-1]
         moves = [[1,0], [-1,0], [0,1], [0,-1]]
         

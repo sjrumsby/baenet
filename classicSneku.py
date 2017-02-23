@@ -7,6 +7,8 @@ class classicSneku(Sneku):
         return abs(b[0] - a[0]) + abs(b[1] - a[1])
     
     def makeMove(self, board):
+        self.body = board["snekus"][self.colour]["body"]
+        self.head = self.body[-1]
         apple = self.getClosestApple(board)
         grid = []
         
