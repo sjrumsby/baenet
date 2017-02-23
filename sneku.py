@@ -104,6 +104,8 @@ class Sneku:
         if nextPos in self.body:
             print "(%s) Don't do that, you'll hit yourself!" % (self.colour)
             return False
+        if nextPos == self.lastMove:
+            return False
             
         return True
         
