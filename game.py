@@ -1,9 +1,12 @@
 from cell import *
 from sneku import *
+from classicSneku import *
+from diagonalSneku import *
 from random import randint
 
 class Game:
-    def __init__(self, height = 17, width = 17, appleMax = 5, appleRate = 5):
+    def __init__(self, snekNames, height = 17, width = 17, appleMax = 5, appleRate = 5):
+        self.snekNames = snekNames
         self.height = height
         self.width = width
         self.apples = [[]]
@@ -25,13 +28,26 @@ class Game:
         snakePos = []
         
         for i in range(numSnakes):
-        
             snakeHouse = self.getRandomCoords()
             while snakeHouse == tastyTuna or snakeHouse in snakePos:
                 snakeHouse = self.getRandomCoords()
-            
-            sneku = Sneku(snakeHouse[0], snakeHouse[1], colours[i], (self.height, self.width))
-            self.snekus.append(sneku)
+                
+            try:
+                if self.snekNames[i] == "classic":
+                    print "Creating classicSneku"
+                    sneku = classicSneku(snakeHouse[0], snakeHouse[1], colours[i], (self.height, self.width))
+                elif self.snekNames[i] == "diagonal":
+                    print "Creating diagonalSneku"
+                    sneku = diagonalSneku(snakeHouse[0], snakeHouse[1], colours[i], (self.height, self.width))
+                else:
+                    print "ERROR: %s is not a real snek. Go make it! Using the dumb snake instead" % self.snekNames[i]
+                    sneku = Sneku(snakeHouse[0], snakeHouse[1], colours[i], (self.height, self.width))
+                self.snekus.append(sneku)
+            except IndexError:
+                print "ERROR: There are not at least %s sneks defined. Go make more! Using the dumb snake instead" % i
+                sneku = Sneku(snakeHouse[0], snakeHouse[1], colours[i], (self.height, self.width))
+                self.snekus.append(sneku)
+                    
         self.apples = [tastyTuna]
         
         print "Start game... apples: %s. snake: %s" % (self.apples, snakeHouse)

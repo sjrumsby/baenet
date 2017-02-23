@@ -5,10 +5,10 @@ import yaml
 
 class Battlesneku:
 	
-    def __init__(self, master, numSnakes, colours, appleMax, appleRate):
+    def __init__(self, master, snekNames, numSnakes, colours, appleMax, appleRate):
         self.state = 0
         self.numSnakes = numSnakes
-        self.game = Game(17, 17, appleMax, appleRate)
+        self.game = Game(snekNames, 17, 17, appleMax, appleRate)
         self.tile_plain = tk.PhotoImage(file = "images/plain.gif")
         self.tile_apple = tk.PhotoImage(file = "images/apple.gif")
         self.snekuSelfie = tk.PhotoImage(file="images/snek.gif")
@@ -227,6 +227,31 @@ def Refresher(snekGame):
 root = tk.Tk()
 root.title("Sneku Feeding!")
 
-snek = Battlesneku(root, config['numSnakes'], config['colours'], config['appleMax'], config['appleRate'])
+try:
+    snekNames = config['snekNames']
+except KeyError:
+    snekNames = ["classic", "diagonal"]
+    
+try:
+    numSnakes = config['numSnakes']
+except KeyError:
+    numSnakes = 6
+    
+try:
+    colours = config['colours']
+except KeyError:
+    colours = ["white", "green", "blue", "yellow", "orange", "pink"]
+    
+try:
+    appleMax = config['appleMax']
+except KeyError:
+    appleMax = 3
+    
+try:
+    appleRate = config['appleRate']
+except KeyError:
+    appleRate = 10
+
+snek = Battlesneku(root, snekNames, numSnakes, colours, appleMax, appleRate)
 Refresher(snek)
 root.mainloop()

@@ -1,10 +1,10 @@
 from numpy import array as numpyArray
 from heapq import *
-from sneku import Sneku
+from sneku import *
 
-class classicSneku(Sneku):
+class diagonalSneku(Sneku):
     def heuristic(self, a, b):
-        return abs(b[0] - a[0]) + abs(b[1] - a[1])
+        return (b[0] - a[0]) ** 2 + (b[1] - a[1]) ** 2
     
     def makeMove(self, board):
         apple = self.getClosestApple(board)
@@ -76,3 +76,4 @@ class classicSneku(Sneku):
         
         self.lastMove = move
         return move
+        
