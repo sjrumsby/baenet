@@ -1,5 +1,6 @@
 numSnakes: 3
 colours: ["white", "green", "blue", "yellow", "orange", "pink"]
-tickRate: 2000
+tickRate: 100
 appleMax: 3
 appleRate: 10
+snekNames: ["classic", "diagonal", "scaredy"]
