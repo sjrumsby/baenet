@@ -7,6 +7,8 @@ class diagonalSneku(Sneku):
         return (b[0] - a[0]) ** 2 + (b[1] - a[1]) ** 2
     
     def makeMove(self, board):
+        self.body = board["snekus"][self.colour]["body"]
+        self.head = self.body[-1]
         apple = self.getClosestApple(board)
         grid = []
         
