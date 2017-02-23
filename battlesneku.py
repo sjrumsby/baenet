@@ -211,10 +211,7 @@ class Battlesneku:
         if self.state != 1:
             return
         
-        for sneku in self.game.snekus:
-            if sneku.dead == False:
-                move = sneku.makeMove(self.game.getBoard())
-        
+        self.game.makeMoves()
         self.game.updateBoard()
         self.updateCells()
 

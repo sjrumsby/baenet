@@ -66,14 +66,6 @@ class diagonalSneku(Sneku):
                     move = m
                     break
         
-        self.head[0] += move[0]
-        self.head[1] += move[1]
-        self.body.append(self.head[:])
-        self.life -= 1
-        
-        if len(self.body) > self.length:
-            self.body = self.body[1:]
-        
         self.lastMove = move
         return move
         

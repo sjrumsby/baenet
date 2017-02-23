@@ -78,7 +78,21 @@ class Game:
         self.apples.append(tastyTuna)
         print "New apple spawned at: %s" % tastyTuna
         
+    def makeMoves(self):
+        for sneku in self.snekus:
+            if sneku.dead == False:
+                m = sneku.makeMove(self.getBoard())
+                newPos = [sneku.head[0] + m[0], sneku.head[1] + m[1]]
+                sneku.body.append(newPos)
+                print "(%s): %s" % (sneku.colour, m)
+        
     def updateBoard(self):
+        for sneku in self.snekus:
+            if len(sneku.body) > sneku.length:
+                sneku.body = sneku.body[1:]
+            sneku.head = sneku.body[-1]
+            sneku.life -= 1
+                
         sneksToKill = []
         aliveSnekus =  [s for s in self.snekus if s.dead == False]
         
@@ -133,12 +147,12 @@ class Game:
             "height": self.height,
             "width": self.width,
             "apples": self.apples,
-            "snekus": []
+            "snekus": {}
         }
         
         for sneku in self.snekus:
             if sneku.dead == False:
-                board['snekus'].append(sneku.body)
+                board['snekus'][sneku.colour] = sneku.body
             
         return board
                 
