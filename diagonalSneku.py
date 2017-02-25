@@ -5,9 +5,6 @@ from sneku import *
 class diagonalSneku(Sneku):
     def getType(self):
         return "diagonal"
-        
-    def heuristic(self, a, b):
-        return (b[0] - a[0]) ** 2 + (b[1] - a[1]) ** 2
     
     def makeMove(self, board):
         self.body = board["snekus"][self.colour]["body"]
@@ -19,8 +16,8 @@ class diagonalSneku(Sneku):
             gridRow = []
             for col in range(board['width']):
                 g = 0
-                for sneku in board['snekus']:
-                    for snekuBody in sneku:
+                for colour, sneku in board['snekus'].iteritems():
+                    for snekuBody in board['snekus'][colour]["body"]:
                         if [row, col] == snekuBody:
                             g = 1
                             

@@ -17,6 +17,12 @@ class Sneku:
         self.dead = False
         self.lastMove = []
         
+    def manhattanDistance(self, a, b):
+        return abs(b[0] - a[0]) + abs(b[1] - a[1])
+        
+    def diagonalDistance(self, a, b):
+        return (b[0] - a[0]) ** 2 + (b[1] - a[1]) ** 2
+        
     def heuristic(self, a, b):
         return abs(b[0] - a[0]) + abs(b[1] - a[1])
     
@@ -107,7 +113,8 @@ class Sneku:
         if nextPos in self.body:
             print "(%s) Don't do that, you'll hit yourself!" % (self.colour)
             return False
-        if nextPos == self.lastMove:
+        if self.lastMove and move == [-1*self.lastMove[0], -1*self.lastMove[1]]:
+            print "Don't go backwards"
             return False
             
         return True

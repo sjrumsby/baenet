@@ -1,7 +1,7 @@
 numSnakes: 3
 colours: ["white", "green", "blue", "yellow", "orange", "pink"]
-tickRate: 100
-appleMax: 3
+tickRate: 500
+appleMax: 1
 appleRate: 10
 snekNames: ["classic", "diagonal", "scaredy"]
 snekLog: "snek.log"

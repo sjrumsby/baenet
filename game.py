@@ -2,6 +2,7 @@ from cell import *
 from sneku import *
 from classicSneku import *
 from diagonalSneku import *
+from scaredySneku import *
 from random import randint
 
 import json
@@ -50,6 +51,9 @@ class Game:
                 elif self.snekNames[i] == "diagonal":
                     print "Creating diagonalSneku"
                     sneku = diagonalSneku(snakeHouse[0], snakeHouse[1], colours[i], (self.height, self.width))
+                elif self.snekNames[i] == "scaredy":
+                    print "Creating diagonalSneku"
+                    sneku = scaredySneku(snakeHouse[0], snakeHouse[1], colours[i], (self.height, self.width))
                 else:
                     print "ERROR: %s is not a real snek. Go make it! Using the dumb snake instead" % self.snekNames[i]
                     sneku = Sneku(snakeHouse[0], snakeHouse[1], colours[i], (self.height, self.width))
